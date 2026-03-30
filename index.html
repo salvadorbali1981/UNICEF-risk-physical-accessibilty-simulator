@@ -564,14 +564,14 @@ function renderAnalysis(text) {
 }
 
 async function callAPI(messages, system) {
-  const body = { model: "claude-sonnet-4-20250514", max_tokens: 1000, messages };
-  if (system) body.system = system;
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messages, system })
   });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   const data = await res.json();
-  return data.content.map(b => b.text || "").join("");
+  return data.text;
 }
 
 function switchScenario() { selectScenario(currentScenarioId === 3 ? 5 : 3); }
