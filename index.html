@@ -42,6 +42,18 @@
 
   body { font-family: var(--ff-sans); background: var(--c-bg); color: var(--c-text); font-size: 15px; line-height: 1.6; min-height: 100vh; }
 
+  #gate { display: none; min-height: 100vh; align-items: center; justify-content: center; }
+  #gate.active { display: flex; }
+  .gate-box { width: 100%; max-width: 320px; padding: 0 1.25rem; display: flex; flex-direction: column; gap: 10px; }
+  .gate-box input { font-family: var(--ff-sans); font-size: 14px; color: var(--c-text); background: var(--c-bg); border: 0.5px solid var(--c-border-md); border-radius: var(--radius); padding: 10px 12px; width: 100%; outline: none; letter-spacing: 0.05em; }
+  .gate-box input:focus { border-color: var(--c-accent); }
+  .gate-box input.shake { animation: shake 0.35s ease; border-color: #c0392b; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
+  .gate-error { font-size: 12px; color: #c0392b; font-family: var(--ff-mono); letter-spacing: 0.05em; min-height: 16px; }
+
+  #app { display: none; }
+  #app.active { display: block; }
+
   .screen { display: none; }
   .screen.active { display: block; }
 
@@ -49,7 +61,6 @@
   .container-sm { max-width: 600px; margin: 0 auto; padding: 2rem 1.25rem; }
 
   .label-xs { font-family: var(--ff-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-muted); }
-
   .badge { display: inline-block; font-family: var(--ff-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; background: var(--c-accent-light); color: var(--c-accent); }
 
   h1 { font-family: var(--ff-serif); font-size: 28px; font-weight: 400; color: var(--c-text); line-height: 1.2; }
@@ -81,19 +92,14 @@
   .constraint-dash { color: var(--c-muted); flex-shrink: 0; margin-top: 1px; }
 
   .objective-box { background: var(--c-accent-light); border-left: 2px solid var(--c-accent); border-radius: 0 var(--radius) var(--radius) 0; padding: 1rem 1.25rem; margin: 1.5rem 0; }
-
   .info-box { background: var(--c-surface); border-radius: var(--radius); padding: 0.875rem 1.125rem; font-size: 13px; color: var(--c-muted); line-height: 1.65; }
 
   .sim-shell { display: flex; flex-direction: column; min-height: 680px; border: 0.5px solid var(--c-border); border-radius: var(--radius-lg); overflow: hidden; background: var(--c-bg); margin: 1rem; }
-
   .sim-topbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 0.5px solid var(--c-border); background: var(--c-surface); flex-shrink: 0; }
-
   .sim-body { display: flex; flex: 1; overflow: hidden; }
-
   .sim-narrative { flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 20px; max-height: 440px; }
 
   .narrative-block { font-family: var(--ff-serif); font-size: 16px; line-height: 1.8; color: var(--c-text); }
-
   .decision-block { background: var(--c-decision); border-radius: var(--radius); padding: 0.875rem 1.125rem; border-left: 2px solid var(--c-border-md); }
   .decision-block .label-xs { margin-bottom: 6px; display: block; }
   .decision-block p { font-family: var(--ff-sans); font-size: 14px; color: var(--c-text); font-style: italic; line-height: 1.6; }
@@ -102,7 +108,6 @@
   @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
   .sim-sidebar { width: 220px; border-left: 0.5px solid var(--c-border); overflow-y: auto; padding: 1rem; flex-shrink: 0; max-height: 440px; }
-
   .log-entry { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 0.5px solid var(--c-border); }
   .log-entry:last-child { border-bottom: none; }
   .log-num { font-family: var(--ff-mono); font-size: 10px; color: var(--c-accent); margin-bottom: 4px; display: block; }
@@ -110,7 +115,6 @@
   .log-consequence { font-size: 11px; color: var(--c-muted); line-height: 1.5; }
 
   .sim-input-area { border-top: 0.5px solid var(--c-border); padding: 1rem 1.5rem; flex-shrink: 0; background: var(--c-bg); }
-
   .input-row { display: flex; gap: 10px; align-items: flex-end; }
   .input-row textarea { min-height: 52px; max-height: 100px; }
 
@@ -138,7 +142,6 @@
   .loading-analysis p { font-family: var(--ff-serif); font-size: 18px; color: var(--c-muted); font-style: italic; }
 
   .error-text { color: #c0392b; font-size: 14px; font-style: italic; }
-
   .transition-overlay { text-align: center; padding: 2rem; font-family: var(--ff-serif); font-size: 18px; color: var(--c-muted); font-style: italic; border-top: 0.5px solid var(--c-border); margin-top: 12px; }
 
   .btn-row { display: flex; gap: 10px; margin-top: 24px; }
@@ -147,125 +150,189 @@
 </head>
 <body>
 
-<div id="screen-select" class="screen active">
-  <div class="container-sm">
-    <div style="margin-bottom:2rem;padding-top:0.5rem;">
-      <p class="label-xs" style="margin-bottom:10px;">UNICEF Physical Accessibility · Module II — Applied Decisions</p>
-      <h1 style="margin-bottom:12px;">Decision Simulator</h1>
-      <p style="color:var(--c-muted);line-height:1.7;max-width:460px;">You will be placed in an operational situation and asked to make a series of decisions. There are no multiple-choice options — you type what you would actually do. Your decisions compound: early choices constrain later ones.</p>
-    </div>
-    <div class="divider"></div>
-    <p class="label-xs" style="margin-bottom:14px;">Choose a scenario</p>
-
-    <div class="scenario-card" onclick="selectScenario(3)">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
-        <span class="badge">Scenario A</span>
-        <span style="font-family:var(--ff-mono);font-size:11px;color:var(--c-muted);">Construction Lead</span>
-      </div>
-      <h2 style="margin-bottom:8px;">The Handover Decision</h2>
-      <p style="font-size:14px;color:var(--c-muted);line-height:1.6;">A non-compliant accessible latrine cubicle has been discovered 48 hours before scheduled handover. The UNICEF PM does not yet know. 23 wheelchair users live in this camp zone.</p>
-    </div>
-
-    <div class="scenario-card" onclick="selectScenario(5)">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
-        <span class="badge">Scenario B</span>
-        <span style="font-family:var(--ff-mono);font-size:11px;color:var(--c-muted);">Selection Committee Member</span>
-      </div>
-      <h2 style="margin-bottom:8px;">The Evaluation Gap</h2>
-      <p style="font-size:14px;color:var(--c-muted);line-height:1.6;">Two proposals are on the table. One includes OPD consultation. It was never written into the TOR. The committee wants to close evaluation by end of week.</p>
-    </div>
+<div id="gate">
+  <div class="gate-box">
+    <input type="password" id="gate-input" placeholder="Access password" autocomplete="current-password" />
+    <button class="btn-primary" id="gate-btn" onclick="checkPassword()">Continue →</button>
+    <p class="gate-error" id="gate-error"></p>
   </div>
 </div>
 
-<div id="screen-briefing" class="screen">
-  <div class="container-sm">
-    <button class="btn-ghost" onclick="goTo('select')" style="margin-bottom:20px;">← Back</button>
-    <span class="badge" id="brief-badge"></span>
-    <h1 id="brief-title" style="margin:10px 0 28px;"></h1>
-    <div style="margin-bottom:22px;">
-      <h3 style="margin-bottom:8px;">Situation</h3>
-      <p id="brief-situation" style="line-height:1.75;"></p>
-    </div>
-    <div style="margin-bottom:22px;">
-      <h3 style="margin-bottom:8px;">Your role</h3>
-      <p id="brief-role" style="line-height:1.75;"></p>
-    </div>
-    <div style="margin-bottom:22px;">
-      <h3 style="margin-bottom:10px;">Constraints</h3>
-      <ul id="brief-constraints" style="list-style:none;"></ul>
-    </div>
-    <div class="objective-box">
-      <h3 style="margin-bottom:6px;color:var(--c-accent);">Your objective</h3>
-      <p id="brief-objective" style="line-height:1.75;"></p>
-    </div>
-    <div class="info-box" style="margin-bottom:24px;">
-      There are no multiple-choice options. After each decision point, type what you would actually do. Expect 5–6 decision rounds. Your decisions will be tracked and analysed in the debrief.
-    </div>
-    <button class="btn-primary" onclick="beginScenario()">Begin scenario →</button>
-  </div>
-</div>
-
-<div id="screen-simulation" class="screen">
-  <div class="sim-shell">
-    <div class="sim-topbar">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span id="sim-badge" class="badge"></span>
-        <span id="sim-title" style="font-size:13px;font-weight:500;"></span>
+<div id="app">
+  <div id="screen-select" class="screen active">
+    <div class="container-sm">
+      <div style="margin-bottom:2rem;padding-top:0.5rem;">
+        <p class="label-xs" style="margin-bottom:10px;">UNICEF Physical Accessibility · Module II — Applied Decisions</p>
+        <h1 style="margin-bottom:12px;">Decision Simulator</h1>
+        <p style="color:var(--c-muted);line-height:1.7;max-width:460px;">You will be placed in an operational situation and asked to make a series of decisions. There are no multiple-choice options — you type what you would actually do. Your decisions compound: early choices constrain later ones.</p>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span class="label-xs">Round</span>
-        <div class="progress-dots" id="progress-dots"></div>
+      <div class="divider"></div>
+      <p class="label-xs" style="margin-bottom:14px;">Choose a scenario</p>
+      <div class="scenario-card" onclick="selectScenario(3)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <span class="badge">Scenario A</span>
+          <span style="font-family:var(--ff-mono);font-size:11px;color:var(--c-muted);">Construction Lead</span>
+        </div>
+        <h2 style="margin-bottom:8px;">The Handover Decision</h2>
+        <p style="font-size:14px;color:var(--c-muted);line-height:1.6;">A non-compliant accessible latrine cubicle has been discovered 48 hours before scheduled handover. The UNICEF PM does not yet know. 23 wheelchair users live in this camp zone.</p>
       </div>
-    </div>
-    <div class="sim-body">
-      <div class="sim-narrative" id="narrative-area"></div>
-      <div class="sim-sidebar">
-        <p class="label-xs" style="margin-bottom:12px;">Decision log</p>
-        <div id="log-area"><p style="font-size:12px;color:var(--c-muted);font-style:italic;">Your decisions will appear here.</p></div>
-      </div>
-    </div>
-    <div class="sim-input-area">
-      <p class="label-xs" style="margin-bottom:8px;">What do you decide to do?</p>
-      <div class="input-row">
-        <textarea id="decision-input" placeholder="Type your decision here… (Enter to submit, Shift+Enter for new line)" rows="2"></textarea>
-        <button class="submit-btn" id="submit-btn" onclick="submitDecision()">Submit</button>
+      <div class="scenario-card" onclick="selectScenario(5)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <span class="badge">Scenario B</span>
+          <span style="font-family:var(--ff-mono);font-size:11px;color:var(--c-muted);">Selection Committee Member</span>
+        </div>
+        <h2 style="margin-bottom:8px;">The Evaluation Gap</h2>
+        <p style="font-size:14px;color:var(--c-muted);line-height:1.6;">Two proposals are on the table. One includes OPD consultation. It was never written into the TOR. The committee wants to close evaluation by end of week.</p>
       </div>
     </div>
   </div>
-</div>
 
-<div id="screen-debrief-reflect" class="screen">
-  <div class="container-sm">
-    <span class="label-xs" id="reflect-label"></span>
-    <h1 style="margin:10px 0 12px;">Before the analysis</h1>
-    <p style="color:var(--c-muted);line-height:1.7;margin-bottom:24px;">Review your decision log. Identify the two decisions you consider most consequential — ones you would make differently, or that you feel you got right for the right reasons. Explain your thinking below.</p>
-    <div class="mini-log" id="mini-log"></div>
-    <div class="reflection-box">
-      <label>First consequential decision — your reasoning</label>
-      <textarea id="ref1" rows="4" placeholder="Which decision, and why was it consequential to you?"></textarea>
+  <div id="screen-briefing" class="screen">
+    <div class="container-sm">
+      <button class="btn-ghost" onclick="goTo('select')" style="margin-bottom:20px;">← Back</button>
+      <span class="badge" id="brief-badge"></span>
+      <h1 id="brief-title" style="margin:10px 0 28px;"></h1>
+      <div style="margin-bottom:22px;"><h3 style="margin-bottom:8px;">Situation</h3><p id="brief-situation" style="line-height:1.75;"></p></div>
+      <div style="margin-bottom:22px;"><h3 style="margin-bottom:8px;">Your role</h3><p id="brief-role" style="line-height:1.75;"></p></div>
+      <div style="margin-bottom:22px;"><h3 style="margin-bottom:10px;">Constraints</h3><ul id="brief-constraints" style="list-style:none;"></ul></div>
+      <div class="objective-box">
+        <h3 style="margin-bottom:6px;color:var(--c-accent);">Your objective</h3>
+        <p id="brief-objective" style="line-height:1.75;"></p>
+      </div>
+      <div class="info-box" style="margin-bottom:24px;">There are no multiple-choice options. After each decision point, type what you would actually do. Expect 5–6 decision rounds. Your decisions will be tracked and analysed in the debrief.</div>
+      <button class="btn-primary" onclick="beginScenario()">Begin scenario →</button>
     </div>
-    <div class="reflection-box">
-      <label>Second consequential decision — your reasoning</label>
-      <textarea id="ref2" rows="4" placeholder="Which decision, and why was it consequential to you?"></textarea>
-    </div>
-    <button class="btn-primary" id="debrief-submit-btn" onclick="submitReflection()">View analysis →</button>
   </div>
-</div>
 
-<div id="screen-debrief-analysis" class="screen">
-  <div class="container-sm">
-    <span class="label-xs" id="analysis-label"></span>
-    <h1 style="margin:10px 0 28px;">Your debrief</h1>
-    <div id="analysis-loading" class="loading-analysis" style="display:none;"><p>Analysing your decisions…</p></div>
-    <div id="analysis-content"></div>
-    <div class="btn-row" id="analysis-btns" style="display:none;">
-      <button class="btn-secondary" onclick="switchScenario()">Try the other scenario</button>
-      <button class="btn-primary" onclick="restart()">Restart this scenario</button>
+  <div id="screen-simulation" class="screen">
+    <div class="sim-shell">
+      <div class="sim-topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span id="sim-badge" class="badge"></span>
+          <span id="sim-title" style="font-size:13px;font-weight:500;"></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="label-xs">Round</span>
+          <div class="progress-dots" id="progress-dots"></div>
+        </div>
+      </div>
+      <div class="sim-body">
+        <div class="sim-narrative" id="narrative-area"></div>
+        <div class="sim-sidebar">
+          <p class="label-xs" style="margin-bottom:12px;">Decision log</p>
+          <div id="log-area"><p style="font-size:12px;color:var(--c-muted);font-style:italic;">Your decisions will appear here.</p></div>
+        </div>
+      </div>
+      <div class="sim-input-area">
+        <p class="label-xs" style="margin-bottom:8px;">What do you decide to do?</p>
+        <div class="input-row">
+          <textarea id="decision-input" placeholder="Type your decision here… (Enter to submit, Shift+Enter for new line)" rows="2"></textarea>
+          <button class="submit-btn" id="submit-btn" onclick="submitDecision()">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-debrief-reflect" class="screen">
+    <div class="container-sm">
+      <span class="label-xs" id="reflect-label"></span>
+      <h1 style="margin:10px 0 12px;">Before the analysis</h1>
+      <p style="color:var(--c-muted);line-height:1.7;margin-bottom:24px;">Review your decision log. Identify the two decisions you consider most consequential — ones you would make differently, or that you feel you got right for the right reasons. Explain your thinking below.</p>
+      <div class="mini-log" id="mini-log"></div>
+      <div class="reflection-box">
+        <label>First consequential decision — your reasoning</label>
+        <textarea id="ref1" rows="4" placeholder="Which decision, and why was it consequential to you?"></textarea>
+      </div>
+      <div class="reflection-box">
+        <label>Second consequential decision — your reasoning</label>
+        <textarea id="ref2" rows="4" placeholder="Which decision, and why was it consequential to you?"></textarea>
+      </div>
+      <button class="btn-primary" id="debrief-submit-btn" onclick="submitReflection()">View analysis →</button>
+    </div>
+  </div>
+
+  <div id="screen-debrief-analysis" class="screen">
+    <div class="container-sm">
+      <span class="label-xs" id="analysis-label"></span>
+      <h1 style="margin:10px 0 28px;">Your debrief</h1>
+      <div id="analysis-loading" class="loading-analysis" style="display:none;"><p>Analysing your decisions…</p></div>
+      <div id="analysis-content"></div>
+      <div class="btn-row" id="analysis-btns" style="display:none;">
+        <button class="btn-secondary" onclick="switchScenario()">Try the other scenario</button>
+        <button class="btn-primary" onclick="restart()">Restart this scenario</button>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
+// No secrets here — all auth is handled server-side.
+let sessionToken = null;
+
+// ─── Gate ────────────────────────────────────────────
+(async function() {
+  const params = new URLSearchParams(window.location.search);
+  const embedToken = params.get('embed');
+  if (embedToken) {
+    await attemptAuth({ embedToken });
+  } else {
+    document.getElementById('gate').classList.add('active');
+    setTimeout(() => document.getElementById('gate-input').focus(), 80);
+  }
+})();
+
+async function checkPassword() {
+  const password = document.getElementById('gate-input').value;
+  if (!password) return;
+  const btn = document.getElementById('gate-btn');
+  btn.disabled = true;
+  btn.textContent = '…';
+  await attemptAuth({ password });
+  btn.disabled = false;
+  btn.textContent = 'Continue →';
+}
+
+async function attemptAuth(payload) {
+  try {
+    const res = await fetch('/.netlify/functions/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      sessionToken = data.token;
+      unlock();
+    } else {
+      showGateError();
+    }
+  } catch(e) {
+    document.getElementById('gate-error').textContent = 'Connection error. Please try again.';
+  }
+}
+
+function showGateError() {
+  const inp = document.getElementById('gate-input');
+  inp.classList.remove('shake');
+  void inp.offsetWidth;
+  inp.classList.add('shake');
+  document.getElementById('gate-error').textContent = 'Incorrect password.';
+  inp.value = '';
+  inp.focus();
+}
+
+function unlock() {
+  document.getElementById('gate').classList.remove('active');
+  document.getElementById('app').classList.add('active');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.activeElement === document.getElementById('gate-input')) {
+    e.preventDefault(); checkPassword();
+  }
+});
+
+// ─── Simulator ───────────────────────────────────────
 const SCENARIOS = {
   3: {
     id: 3,
@@ -274,40 +341,11 @@ const SCENARIOS = {
     briefing: {
       situation: "Your team has completed a UNICEF-funded emergency latrine block in a humanitarian camp — on schedule and within budget. During the final internal quality review, your site engineer flags a critical measurement: the accessible latrine cubicle has a door that swings inward, leaving only 120 cm of turning radius inside. The ISO 21542:2021 specification written into your contract requires 150 cm. This cubicle was built to serve wheelchair users in the camp.",
       role: "You are the Construction Lead at the contracted firm. You have two days before the UNICEF Project Manager arrives for formal handover. Your firm's milestone payment is tied to that handover date. You are the person who must decide what to do with this information.",
-      constraints: [
-        "Fixing the door requires re-hinging and recessing floor drainage — approximately three days of work",
-        "The correct drainage parts are not available locally and would need to be imported",
-        "Correction cost is absorbed by your firm — it is not billable to UNICEF",
-        "The rest of the latrine block is fully compliant and operationally ready",
-        "Delaying handover affects your firm's cash flow and its long-term relationship with UNICEF",
-        "Camp population data shows 23 registered wheelchair users in this zone"
-      ],
+      constraints: ["Fixing the door requires re-hinging and recessing floor drainage — approximately three days of work","The correct drainage parts are not available locally and would need to be imported","Correction cost is absorbed by your firm — it is not billable to UNICEF","The rest of the latrine block is fully compliant and operationally ready","Delaying handover affects your firm's cash flow and its long-term relationship with UNICEF","Camp population data shows 23 registered wheelchair users in this zone"],
       objective: "Navigate the next 48 hours — and the decisions that follow — as you manage the gap between what was delivered and what was specified."
     },
     opener: "The scenario begins. Your site engineer has just shown you the measurement: 120 cm turning radius, not 150 cm as specified. The UNICEF Project Manager arrives for handover in two days. The rest of the block is ready and the camp needs it. What is your first move?",
-    systemPrompt: `You are a simulation engine running a physical accessibility decision scenario for UNICEF professional training.
-
-The learner is playing the role of a Construction Lead at a contracted firm. Their firm has just completed a UNICEF-funded emergency latrine block. An internal review has flagged that the accessible cubicle does not meet the ISO 21542:2021 turning radius specification: 120 cm delivered vs. 150 cm required. The UNICEF PM arrives for formal handover in two days.
-
-Complicating factors:
-1. Fixing the door requires 3 days of work and imported parts — handover is in 2 days
-2. The correction cost is absorbed by the firm, not billable to UNICEF
-3. Milestone payment is tied to successful handover
-4. The UNICEF PM does not yet know about the gap
-5. 23 registered wheelchair users live in this camp zone
-6. The firm has a long-standing relationship with UNICEF as a repeat contractor
-
-Simulation rules:
-- Present one decision point at a time
-- After each learner decision, describe the realistic consequence in 2-3 sentences — make consequences cumulative and compounding so early decisions constrain later options
-- Follow the consequence immediately with 1-2 sentences presenting the next decision point
-- Do not offer multiple choice — the learner types freely
-- Do not reveal a correct answer or tell the learner what they should have done
-- Track whether the learner discloses proactively or conceals the gap; escalates to the right level; considers the wheelchair users concretely; negotiates conditional handover vs. full acceptance; documents their decisions
-
-After exactly 5 decision-response cycles, output the exact text DEBRIEF_READY on its own line, followed by one sentence summarising where the situation now stands.
-
-Tone: Realistic, operationally grounded, no moralising. Consequences should feel like genuine professional and programmatic outcomes, not punishments.`,
+    systemPrompt: `You are a simulation engine running a physical accessibility decision scenario for UNICEF professional training.\n\nThe learner is playing the role of a Construction Lead at a contracted firm. Their firm has just completed a UNICEF-funded emergency latrine block. An internal review has flagged that the accessible cubicle does not meet the ISO 21542:2021 turning radius specification: 120 cm delivered vs. 150 cm required. The UNICEF PM arrives for formal handover in two days.\n\nComplicating factors:\n1. Fixing the door requires 3 days of work and imported parts — handover is in 2 days\n2. The correction cost is absorbed by the firm, not billable to UNICEF\n3. Milestone payment is tied to successful handover\n4. The UNICEF PM does not yet know about the gap\n5. 23 registered wheelchair users live in this camp zone\n6. The firm has a long-standing relationship with UNICEF as a repeat contractor\n\nSimulation rules:\n- Present one decision point at a time\n- After each learner decision, describe the realistic consequence in 2-3 sentences\n- Follow the consequence immediately with 1-2 sentences presenting the next decision point\n- Do not offer multiple choice\n- Do not reveal a correct answer\n\nAfter exactly 5 decision-response cycles, output the exact text DEBRIEF_READY on its own line, followed by one sentence summarising where the situation now stands.\n\nTone: Realistic, operationally grounded, no moralising.`,
     debriefRole: "Construction Lead",
     debriefContext: "accessible latrine cubicle non-compliance and handover decision"
   },
@@ -318,56 +356,19 @@ Tone: Realistic, operationally grounded, no moralising. Consequences should feel
     briefing: {
       situation: "Your committee is evaluating two technical proposals for the fit-out of a new UNICEF country office. Proposal A is 12% cheaper, meets all stated accessibility specifications, and commits to a four-month delivery. Proposal B is more expensive and slower — but it includes a structured two-week OPD (Organisation of Persons with Disabilities) walkthrough and consultation phase built into the design process. The problem: OPD consultation was never written into the TOR. It carries no scoring weight in your evaluation matrix.",
       role: "You are a Selection Committee member. You reviewed both proposals the previous evening and flagged the OPD consultation gap in your personal notes. The committee session is now open. You have to decide what to do with what you have found — within the constraints of the procurement process.",
-      constraints: [
-        "Amending the TOR mid-evaluation risks procurement integrity and may require restarting the entire process",
-        "Proposal A is within budget; Proposal B requires a budget amendment approval",
-        "The committee chair wants to close evaluation by end of week — the country office opening is politically significant",
-        "UNICEF DIPAS 2022-2030 embeds OPD consultation as standard practice — but it is not cited in this TOR",
-        "At least one committee member insists on scoring strictly against the TOR and no more",
-        "Requesting vendor clarification extends the timeline by a minimum of one week"
-      ],
+      constraints: ["Amending the TOR mid-evaluation risks procurement integrity and may require restarting the entire process","Proposal A is within budget; Proposal B requires a budget amendment approval","The committee chair wants to close evaluation by end of week — the country office opening is politically significant","UNICEF DIPAS 2022-2030 embeds OPD consultation as standard practice — but it is not cited in this TOR","At least one committee member insists on scoring strictly against the TOR and no more","Requesting vendor clarification extends the timeline by a minimum of one week"],
       objective: "Decide how to handle the OPD consultation gap — and navigate the consequences of each step you take within the committee process and beyond."
     },
     opener: "The scenario begins. You flagged the OPD consultation issue in your notes last night. The committee chair has just opened the session and asked whether there are any procedural matters before scoring begins. What do you say — or do you say nothing yet?",
-    systemPrompt: `You are a simulation engine running a procurement and accessibility decision scenario for UNICEF professional training.
-
-The learner is playing the role of a UNICEF Selection Committee member evaluating two construction proposals for a new country office fit-out. Proposal B includes OPD (Organisation of Persons with Disabilities) consultation built into its design process, but OPD consultation was never written into the TOR — so it carries no scoring weight. Proposal A is 12% cheaper and scores higher on the stated criteria.
-
-Complicating factors:
-1. Amending the TOR mid-evaluation risks procurement integrity and may require restarting the process
-2. The committee chair wants to close evaluation this week — the country office opening is politically significant
-3. UNICEF DIPAS 2022-2030 mandates OPD engagement, but it is not cited in this TOR
-4. At least one committee member insists on scoring strictly against the TOR
-5. Requesting vendor clarification adds a minimum one week to the timeline
-6. Selecting Proposal A means the designed space will never have received OPD input — a permanent feature of the building
-
-Simulation rules:
-- Present one decision point at a time
-- After each learner decision, describe the realistic consequence in 2-3 sentences — make consequences cumulative and compounding so early decisions constrain later options
-- Follow the consequence immediately with 1-2 sentences presenting the next decision point
-- Do not offer multiple choice — the learner types freely
-- Do not reveal a correct answer or tell the learner what they should have done
-- Track whether the learner raises the gap formally or informally; escalates to the procurement officer; attempts to reframe criteria; considers what the omission means for the built environment long-term; documents dissent if overruled
-
-After exactly 5 decision-response cycles, output the exact text DEBRIEF_READY on its own line, followed by one sentence summarising where the evaluation now stands.
-
-Tone: Realistic, procurement-specific, no moralising. Show how process integrity and inclusion principles can genuinely conflict — without artificially resolving that tension.`,
+    systemPrompt: `You are a simulation engine running a procurement and accessibility decision scenario for UNICEF professional training.\n\nThe learner is a UNICEF Selection Committee member evaluating two construction proposals. Proposal B includes OPD consultation not in the TOR. Proposal A is 12% cheaper and scores higher on stated criteria.\n\nComplicating factors:\n1. Amending TOR mid-evaluation risks procurement integrity\n2. Committee chair wants to close this week\n3. UNICEF DIPAS 2022-2030 mandates OPD engagement, not cited in TOR\n4. One member insists on scoring strictly against TOR\n5. Vendor clarification adds minimum one week\n6. Selecting Proposal A means no OPD input ever — permanent feature of the building\n\nSimulation rules:\n- Present one decision point at a time\n- Consequences are cumulative and compounding\n- No multiple choice, no correct answer revealed\n\nAfter exactly 5 decision-response cycles, output DEBRIEF_READY on its own line, then one sentence on where the evaluation stands.\n\nTone: Realistic, procurement-specific, no moralising.`,
     debriefRole: "Selection Committee Member",
     debriefContext: "OPD consultation gap in vendor evaluation and procurement decision"
   }
 };
 
-let currentScenarioId = null;
-let conversationHistory = [];
-let decisionLog = [];
-let decisionCount = 0;
-let isLoading = false;
-let transitionPending = false;
+let currentScenarioId = null, conversationHistory = [], decisionLog = [], decisionCount = 0, isLoading = false, transitionPending = false;
 
-function goTo(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + id).classList.add('active');
-}
+function goTo(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('screen-' + id).classList.add('active'); }
 
 function selectScenario(id) {
   currentScenarioId = id;
@@ -377,21 +378,14 @@ function selectScenario(id) {
   document.getElementById('brief-situation').textContent = sc.briefing.situation;
   document.getElementById('brief-role').textContent = sc.briefing.role;
   document.getElementById('brief-objective').textContent = sc.briefing.objective;
-  const ul = document.getElementById('brief-constraints');
-  ul.innerHTML = sc.briefing.constraints.map(c =>
-    `<li class="constraint-item"><span class="constraint-dash">—</span><span style="font-size:14px;line-height:1.65;">${c}</span></li>`
-  ).join('');
+  document.getElementById('brief-constraints').innerHTML = sc.briefing.constraints.map(c =>
+    `<li class="constraint-item"><span class="constraint-dash">—</span><span style="font-size:14px;line-height:1.65;">${c}</span></li>`).join('');
   goTo('briefing');
 }
 
 function updateProgressDots() {
-  const c = document.getElementById('progress-dots');
-  c.innerHTML = '';
-  for (let i = 0; i < 5; i++) {
-    const d = document.createElement('div');
-    d.className = 'dot' + (i < decisionCount ? ' filled' : '');
-    c.appendChild(d);
-  }
+  const c = document.getElementById('progress-dots'); c.innerHTML = '';
+  for (let i = 0; i < 5; i++) { const d = document.createElement('div'); d.className = 'dot' + (i < decisionCount ? ' filled' : ''); c.appendChild(d); }
 }
 
 async function beginScenario() {
@@ -402,9 +396,7 @@ async function beginScenario() {
   document.getElementById('narrative-area').innerHTML = '';
   document.getElementById('log-area').innerHTML = '<p style="font-size:12px;color:var(--c-muted);font-style:italic;">Your decisions will appear here.</p>';
   document.getElementById('decision-input').value = '';
-  updateProgressDots();
-  goTo('simulation');
-  setLoading(true);
+  updateProgressDots(); goTo('simulation'); setLoading(true);
   conversationHistory = [{ role: "user", content: sc.opener }];
   try {
     const text = await callAPI(conversationHistory, sc.systemPrompt);
@@ -415,14 +407,12 @@ async function beginScenario() {
 }
 
 function appendBlock(text, type) {
-  const area = document.getElementById('narrative-area');
-  const b = document.createElement('div');
+  const area = document.getElementById('narrative-area'), b = document.createElement('div');
   if (type === 'situation') { b.className = 'narrative-block'; b.textContent = text; }
   else if (type === 'decision') { b.className = 'decision-block'; b.innerHTML = `<span class="label-xs">Your decision — round ${decisionCount}</span><p>${esc(text)}</p>`; }
   else if (type === 'transition') { b.className = 'transition-overlay'; b.textContent = text; }
   else { b.className = 'error-text'; b.textContent = text; }
-  area.appendChild(b);
-  b.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  area.appendChild(b); b.scrollIntoView({ behavior: 'smooth', block: 'end' });
 }
 
 function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -432,33 +422,25 @@ function setLoading(val) {
   document.getElementById('submit-btn').disabled = val;
   document.getElementById('decision-input').disabled = val;
   const ex = document.getElementById('loading-indicator');
-  if (val) {
-    if (!ex) { const l = document.createElement('div'); l.id='loading-indicator'; l.className='loading-dot'; l.textContent='Processing…'; document.getElementById('narrative-area').appendChild(l); }
-  } else { if (ex) ex.remove(); }
+  if (val) { if (!ex) { const l = document.createElement('div'); l.id='loading-indicator'; l.className='loading-dot'; l.textContent='Processing…'; document.getElementById('narrative-area').appendChild(l); } }
+  else { if (ex) ex.remove(); }
 }
 
 function addLogEntry(decision, consequence) {
-  const area = document.getElementById('log-area');
-  const ph = area.querySelector('p');
+  const area = document.getElementById('log-area'), ph = area.querySelector('p');
   if (ph && ph.textContent.includes('Your decisions will appear')) ph.remove();
   const e = document.createElement('div'); e.className = 'log-entry';
   e.innerHTML = `<span class="log-num">DECISION ${decisionLog.length}</span><p class="log-decision">${esc(decision.length>60?decision.slice(0,60)+'…':decision)}</p><p class="log-consequence">${esc(consequence.length>100?consequence.slice(0,100)+'…':consequence)}</p>`;
-  area.appendChild(e);
-  e.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  area.appendChild(e); e.scrollIntoView({ behavior: 'smooth', block: 'end' });
 }
 
 async function submitDecision() {
-  const inp = document.getElementById('decision-input');
-  const text = inp.value.trim();
+  const inp = document.getElementById('decision-input'), text = inp.value.trim();
   if (!text || isLoading || transitionPending) return;
-  inp.value = '';
-  decisionCount++;
-  updateProgressDots();
-  appendBlock(text, 'decision');
-  setLoading(true);
-  const sc = SCENARIOS[currentScenarioId];
+  inp.value = ''; decisionCount++; updateProgressDots(); appendBlock(text, 'decision'); setLoading(true);
   conversationHistory.push({ role: "user", content: text });
   try {
+    const sc = SCENARIOS[currentScenarioId];
     const response = await callAPI(conversationHistory, sc.systemPrompt);
     const isReady = response.includes('DEBRIEF_READY');
     const clean = response.replace('DEBRIEF_READY', '').trim();
@@ -466,13 +448,7 @@ async function submitDecision() {
     appendBlock(clean, 'situation');
     decisionLog.push({ n: decisionCount, decision: text, consequence: clean });
     addLogEntry(text, clean);
-    if (isReady) {
-      transitionPending = true;
-      setLoading(false);
-      appendBlock('Scenario complete. Moving to debrief…', 'transition');
-      setTimeout(() => prepareDebrief(), 2200);
-      return;
-    }
+    if (isReady) { transitionPending = true; setLoading(false); appendBlock('Scenario complete. Moving to debrief…', 'transition'); setTimeout(() => prepareDebrief(), 2200); return; }
   } catch(e) { appendBlock('Connection error. Please try again.', 'error'); }
   setLoading(false);
 }
@@ -482,15 +458,12 @@ function prepareDebrief() {
   document.getElementById('reflect-label').textContent = `Debrief — ${sc.title}`;
   document.getElementById('mini-log').innerHTML = '<p class="label-xs" style="margin-bottom:10px;">Your decisions this session</p>' +
     decisionLog.map(l => `<div class="mini-log-item"><span class="mini-n">#${l.n}</span><span style="font-size:13px;color:var(--c-text);line-height:1.5;">${esc(l.decision.length>80?l.decision.slice(0,80)+'…':l.decision)}</span></div>`).join('');
-  document.getElementById('ref1').value = '';
-  document.getElementById('ref2').value = '';
-  document.getElementById('debrief-submit-btn').disabled = true;
-  goTo('debrief-reflect');
+  document.getElementById('ref1').value = ''; document.getElementById('ref2').value = '';
+  document.getElementById('debrief-submit-btn').disabled = true; goTo('debrief-reflect');
 }
 
 async function submitReflection() {
-  const r1 = document.getElementById('ref1').value.trim();
-  const r2 = document.getElementById('ref2').value.trim();
+  const r1 = document.getElementById('ref1').value.trim(), r2 = document.getElementById('ref2').value.trim();
   if (!r1 || !r2) return;
   const sc = SCENARIOS[currentScenarioId];
   document.getElementById('analysis-label').textContent = `Analysis — ${sc.title}`;
@@ -499,37 +472,11 @@ async function submitReflection() {
   document.getElementById('analysis-loading').style.display = 'block';
   goTo('debrief-analysis');
   const decisions = decisionLog.map(l => `Decision ${l.n}: ${l.decision}`).join('\n');
-  const prompt = `You are delivering a structured debrief for a UNICEF physical accessibility decision simulator.
-
-Scenario: "${sc.title}" — the learner played the role of ${sc.debriefRole}, navigating ${sc.debriefContext}.
-
-Decisions made during the simulation:
-${decisions}
-
-Learner reflections:
-On their first most consequential decision: "${r1}"
-On their second most consequential decision: "${r2}"
-
-Deliver a debrief with exactly these four sections. Use the exact section headings below:
-
-**Decision pattern**
-2-3 sentences identifying the consistent instinct or approach driving their choices across the session.
-
-**Key turning point**
-2-3 sentences naming the single decision that most constrained all subsequent options, and explaining specifically why it was the pivot.
-
-**What was missed**
-2-3 sentences naming the specific user group impact, process gap, or escalation path not taken. Be operationally specific — reference ISO 21542:2021, DIPAS, or OPD engagement where relevant to this scenario.
-
-**Two closing questions**
-Two questions that connect this scenario directly to the learner's actual professional role at UNICEF. Make them specific enough to be uncomfortable — they should require genuine thought, not a rehearsed answer.
-
-Tone: Analytical, direct, collegial. No praise inflation. No moralising. Treat the learner as a professional who can handle a direct assessment.`;
+  const prompt = `You are delivering a structured debrief for a UNICEF physical accessibility decision simulator.\n\nScenario: "${sc.title}" — the learner played the role of ${sc.debriefRole}, navigating ${sc.debriefContext}.\n\nDecisions made:\n${decisions}\n\nLearner reflections:\nFirst: "${r1}"\nSecond: "${r2}"\n\nDeliver a debrief with exactly these four sections:\n\n**Decision pattern**\n2-3 sentences on the consistent instinct driving their choices.\n\n**Key turning point**\n2-3 sentences on the single decision that most constrained subsequent options.\n\n**What was missed**\n2-3 sentences on the specific user group impact or process gap not addressed. Reference ISO 21542:2021, DIPAS, or OPD engagement where relevant.\n\n**Two closing questions**\nTwo questions connecting this scenario to the learner's actual UNICEF role. Make them specific enough to require genuine thought.\n\nTone: Analytical, direct, collegial. No praise inflation. No moralising.`;
   try {
     const text = await callAPI([{ role: "user", content: prompt }]);
     document.getElementById('analysis-loading').style.display = 'none';
-    renderAnalysis(text);
-    document.getElementById('analysis-btns').style.display = 'flex';
+    renderAnalysis(text); document.getElementById('analysis-btns').style.display = 'flex';
   } catch(e) {
     document.getElementById('analysis-loading').style.display = 'none';
     document.getElementById('analysis-content').innerHTML = '<p class="error-text">Unable to load analysis. Please check your connection and try again.</p>';
@@ -537,14 +484,8 @@ Tone: Analytical, direct, collegial. No praise inflation. No moralising. Treat t
 }
 
 function renderAnalysis(text) {
-  const sections = [
-    { key: 'Decision pattern', label: 'Decision pattern' },
-    { key: 'Key turning point', label: 'Key turning point' },
-    { key: 'What was missed', label: 'What was missed' },
-    { key: 'Two closing questions', label: 'Closing questions' }
-  ];
-  const container = document.getElementById('analysis-content');
-  container.innerHTML = '';
+  const sections = [{ key: 'Decision pattern', label: 'Decision pattern' },{ key: 'Key turning point', label: 'Key turning point' },{ key: 'What was missed', label: 'What was missed' },{ key: 'Two closing questions', label: 'Closing questions' }];
+  const container = document.getElementById('analysis-content'); container.innerHTML = '';
   let rem = text;
   sections.forEach((sec, i) => {
     const nextKey = i < sections.length - 1 ? sections[i+1].key : null;
@@ -558,16 +499,16 @@ function renderAnalysis(text) {
     container.appendChild(div);
     if (nextKey) { const ni = rem.search(new RegExp(nextKey.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'i')); if (ni !== -1) rem = rem.slice(ni); }
   });
-  if (container.children.length === 0) {
-    container.innerHTML = `<div class="debrief-section"><p style="white-space:pre-wrap;line-height:1.75;">${esc(text)}</p></div>`;
-  }
+  if (container.children.length === 0) container.innerHTML = `<div class="debrief-section"><p style="white-space:pre-wrap;line-height:1.75;">${esc(text)}</p></div>`;
 }
 
 async function callAPI(messages, system) {
-  const res = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ messages, system })
+  const body = { messages, token: sessionToken };
+  if (system) body.system = system;
+  const res = await fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
   });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   const data = await res.json();
@@ -578,17 +519,12 @@ function switchScenario() { selectScenario(currentScenarioId === 3 ? 5 : 3); }
 function restart() { conversationHistory=[]; decisionLog=[]; decisionCount=0; transitionPending=false; selectScenario(currentScenarioId); }
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey && document.activeElement === document.getElementById('decision-input')) {
-    e.preventDefault(); submitDecision();
-  }
+  if (e.key === 'Enter' && !e.shiftKey && document.activeElement === document.getElementById('decision-input')) { e.preventDefault(); submitDecision(); }
 });
 
 document.getElementById('ref1').addEventListener('input', checkReady);
 document.getElementById('ref2').addEventListener('input', checkReady);
-function checkReady() {
-  document.getElementById('debrief-submit-btn').disabled =
-    !(document.getElementById('ref1').value.trim() && document.getElementById('ref2').value.trim());
-}
+function checkReady() { document.getElementById('debrief-submit-btn').disabled = !(document.getElementById('ref1').value.trim() && document.getElementById('ref2').value.trim()); }
 document.getElementById('debrief-submit-btn').disabled = true;
 </script>
 </body>
